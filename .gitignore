@@ -1,0 +1,30 @@
+# 🔹 Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# 🔹 Logs & Environment Files
+logs/
+*.log
+debug.log
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# 🔹 Database & Uploads
+/uploads/
+mongodb-data/
+
+# 🔹 Build Files
+client/build/
+server/dist/
+
+# 🔹 Editor & OS Specific Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
