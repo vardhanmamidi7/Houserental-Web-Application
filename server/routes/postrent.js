@@ -32,6 +32,18 @@ router.post("/", upload.array("images", 5), async (req, res) => {
       });
     }
 
+    // ✅ Convert rent and capacity to numbers
+    const rentValue = Number(rent);
+    const capacityValue = Number(capacity);
+
+    // ✅ Validation checks
+    if (capacityValue > 10) {
+      return res.status(400).json({ message: "❌ Capacity cannot exceed 10." });
+    }
+    if (rentValue > 50000) {
+      return res.status(400).json({ message: "❌ Rent cannot exceed 50,000." });
+    }
+
     // ✅ Check if images exist before mapping
     const images = req.files && req.files.length > 0
       ? req.files.map((file) => `/uploads/${file.filename}`)
@@ -42,10 +54,10 @@ router.post("/", upload.array("images", 5), async (req, res) => {
       title,
       description,
       type,
-      rent,
+      rent: rentValue,
       location,
       images,
-      capacity,
+      capacity: capacityValue,
       owner,
     });
 
