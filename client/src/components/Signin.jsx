@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react"; // ✅ Add useState
-import { Link, useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signin = () => {
-  const navigate = useNavigate(); // ✅ Initialize navigate function
+  const navigate = useNavigate(); 
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,34 +22,22 @@ const Signin = () => {
     setLoading(true);
 
     try {
-      // 🔹 First, check if the user exists
-      const checkResponse = await fetch(
-        `http://localhost:5001/api/auth/check-user?email=${formData.email}`
-      );
-      const checkData = await checkResponse.json();
-
-      if (!checkResponse.ok || !checkData.exists) {
-        setMessage("❌ User not found! Please sign up.");
-        setLoading(false);
-        return;
-      }
-
-      // 🔹 If user exists, proceed with login
       const response = await fetch("http://localhost:5001/api/auth/signin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
-      if (response.ok) {
-        setMessage("✅ Sign in successful!");
 
-        // 🔹 Redirect to House Rental Page after a short delay
+      if (response.ok) {
+        // ✅ Store user ID in localStorage
+        localStorage.setItem("userId", data.userId);
+
+        setMessage("✅ Sign in successful!");
+        
         setTimeout(() => {
-          navigate("/houserental"); // ✅ Correct route
+          navigate("/houserental"); 
         }, 1000);
       } else {
         setMessage(`❌ ${data.message || "Invalid credentials."}`);
@@ -105,7 +94,7 @@ const Signin = () => {
           }`}
           disabled={loading}
         >
-          {loading ? "Checking..." : "Sign In"}
+          {loading ? "Signing in..." : "Sign In"}
         </button>
 
         <p className="text-center text-sm text-gray-400 mt-4">

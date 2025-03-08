@@ -4,9 +4,10 @@ import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
+// ✅ Signup Route
 router.post("/signup", async (req, res) => {
   try {
-    const { name, phone, email, password, state } = req.body;
+    const { name, phone, email, password, state, role } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -16,31 +17,25 @@ router.post("/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
-    const newUser = new User({ name, phone, email, password: hashedPassword, state });
+    const newUser = new User({ name, phone, email, password: hashedPassword, state, role });
     await newUser.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({ 
+      message: "User registered successfully", 
+      userId: newUser._id // ✅ Return user ID
+    });
   } catch (error) {
     res.status(500).json({ message: "Error registering user", error });
   }
 });
 
-
-
-
-
-
-// Check if user exists
+// ✅ Check if user exists
 router.get("/check-user", async (req, res) => {
   try {
     const { email } = req.query;
-
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
+    if (!email) return res.status(400).json({ message: "Email is required" });
 
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       return res.status(200).json({ exists: true, message: "User exists" });
     } else {
@@ -51,12 +46,7 @@ router.get("/check-user", async (req, res) => {
   }
 });
 
-
-
-
-
-
-// 🔹 Sign-in Route
+// ✅ Sign-in Route
 router.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -69,7 +59,10 @@ router.post("/signin", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials." });
 
-    res.status(200).json({ message: "Sign in successful!" });
+    res.status(200).json({ 
+      message: "Sign in successful!", 
+      userId: user._id // ✅ Return user ID
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

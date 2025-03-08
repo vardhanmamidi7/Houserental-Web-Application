@@ -4,45 +4,57 @@ import Property from "../models/Property.js";
 
 const router = express.Router();
 
-// Multer setup for handling image uploads
+// ✅ Multer setup for handling image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Save images inside "uploads" folder
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // Unique filename
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-router.post("/postrent", upload.array("images", 5), async (req, res) => {
+// ✅ Route to handle property posting
+router.post("/", upload.array("images", 5), async (req, res) => {
   try {
+    console.log("📌 Received Data:", req.body); // Debugging
+    console.log("📌 Received Files:", req.files); // Debugging
+
+    // Ensure body fields are parsed correctly
     const { title, description, type, rent, location, capacity, owner } = req.body;
-    
-    // 🔴 Check if images were uploaded
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "Please upload at least one image" });
+
+    if (!title || !description || !type || !rent || !location || !capacity || !owner) {
+      return res.status(400).json({
+        message: "❌ Missing required fields",
+        missingFields: { title, description, type, rent, location, capacity, owner },
+      });
     }
 
-    // Save uploaded image paths
-    const images = req.files.map((file) => `/uploads/${file.filename}`);
+    // ✅ Check if images exist before mapping
+    const images = req.files && req.files.length > 0
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
 
+    // ✅ Create new property
     const newProperty = new Property({
       title,
       description,
       type,
       rent,
       location,
-      images, // Save image URLs
+      images,
       capacity,
       owner,
     });
 
     await newProperty.save();
-    res.status(201).json({ message: "Property posted successfully", property: newProperty });
+    res.status(201).json({ message: "✅ Property posted successfully!", property: newProperty });
+
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("❌ Error:", error);
+    res.status(500).json({ message: "❌ Server Error", error: error.message });
   }
 });
 
