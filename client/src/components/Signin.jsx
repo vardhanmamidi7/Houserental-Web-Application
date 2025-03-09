@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Signin = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -20,25 +20,22 @@ const Signin = () => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
-
+  
     try {
       const response = await fetch("http://localhost:5001/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await response.json();
-
+      console.log("Response Data:", data); // 🔍 Debugging step
+  
       if (response.ok) {
-        // ✅ Store user ID in localStorage
-        localStorage.setItem("userId", data.userId);
-
+        localStorage.setItem("user", JSON.stringify(data.user)); // ✅ Stores full user data
+        console.log("Stored User:", JSON.parse(localStorage.getItem("user"))); // ❌ Wrong! Should store full user data
         setMessage("✅ Sign in successful!");
-        
-        setTimeout(() => {
-          navigate("/houserental"); 
-        }, 1000);
+        setTimeout(() => navigate("/houserental"), 1000);
       } else {
         setMessage(`❌ ${data.message || "Invalid credentials."}`);
       }
@@ -48,7 +45,7 @@ const Signin = () => {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">
       <form

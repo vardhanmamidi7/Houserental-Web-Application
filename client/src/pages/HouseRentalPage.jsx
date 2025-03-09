@@ -42,8 +42,19 @@ const HouseRentalPage = () => {
       <nav className="flex justify-between items-center p-4 bg-gray-800">
         <div className="text-2xl font-bold text-purple-400">Logo</div>
         <div className="flex gap-6">
-          <button className="hover:text-purple-400">Your Bookings</button>
+          <button 
+            className="hover:text-purple-400" 
+            onClick={() => navigate("/your-bookings")}
+          >
+            Your Bookings
+          </button>
           <button className="hover:text-purple-400">User Profile</button>
+          <button 
+            className="hover:text-purple-400" 
+            onClick={() => navigate("/orders")}
+          >
+            Orders
+          </button>
           <button
             className="bg-purple-500 px-4 py-2 rounded-lg hover:bg-purple-600"
             onClick={() => navigate("/postrent")}

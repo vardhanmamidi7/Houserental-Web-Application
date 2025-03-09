@@ -1,16 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const propertySchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true }, // Added description
-  type: { type: String, required: true },
-  rent: { type: Number, required: true },
-  location: { type: String, required: true },
-  images: [{ type: String }], // Will store image URLs
-  capacity: { type: Number, required: true },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  title: String,
+  description: String,
+  type: String,
+  rent: Number,
+  location: String,
+  capacity: Number,
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Make sure this is correct
+  images: [String],
   createdAt: { type: Date, default: Date.now }
 });
 
-const Property = mongoose.model('Property', propertySchema);
+const Property = mongoose.model("Property", propertySchema);
 export default Property;

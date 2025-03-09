@@ -5,7 +5,8 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import propertyRoutes from "./routes/propertyRoutes.js";
 import postRentRoutes from "./routes/postrent.js";
-
+import bookingRoutes from "./routes/bookings.js";
+import ordersRoute from  "././routes/orders.js"
 dotenv.config();
 
 const PORT = process.env.PORT || 5001;
@@ -22,6 +23,10 @@ app.use("/uploads", express.static("uploads")); // ✅ Serves uploaded images
 app.use("/api/postrent", postRentRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes); // ✅ Correct path
+
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/orders", ordersRoute);
+
 
 // 🔹 MongoDB Connection
 const connectDB = async () => {

@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Added useNavigate
+import { useNavigate } from "react-router-dom";
 
-const SignupForm = () => {
+const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     state: "",
     password: "",
+    role: "Rent-Taking Person", // Default role
   });
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // ✅ Navigation hook
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,22 +23,24 @@ const SignupForm = () => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
-
+  
     try {
       const response = await fetch("http://localhost:5001/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await response.json();
+  
       if (response.ok) {
         setMessage("✅ User registered successfully!");
-        setFormData({ name: "", phone: "", email: "", state: "", password: "" });
-
-        // 🔹 Redirect to HouseRentalPage after successful signup
+  
+        // ✅ Store full user details in localStorage
+        localStorage.setItem("user", JSON.stringify(data.user));
+  
         setTimeout(() => {
-          navigate("/houserental"); // ✅ Correct route
+          navigate("/houserental");
         }, 1000);
       } else {
         setMessage(`❌ ${data.message || "Error registering user."}`);
@@ -48,6 +51,7 @@ const SignupForm = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
@@ -108,6 +112,17 @@ const SignupForm = () => {
           required
         />
 
+        <label className="block text-sm text-gray-400 mb-2">Select Role</label>
+        <select
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          className="w-full p-2 border rounded mb-4 bg-gray-700 text-white border-gray-600"
+        >
+          <option value="Owner">Owner</option>
+          <option value="Rent-Taking Person">Rent-Taking Person</option>
+        </select>
+
         <button
           type="submit"
           className={`w-full p-2 rounded text-white font-bold ${
@@ -122,4 +137,4 @@ const SignupForm = () => {
   );
 };
 
-export default SignupForm;
+export default Signup;

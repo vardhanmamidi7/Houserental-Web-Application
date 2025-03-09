@@ -20,14 +20,20 @@ router.post("/signup", async (req, res) => {
     const newUser = new User({ name, phone, email, password: hashedPassword, state, role });
     await newUser.save();
 
-    res.status(201).json({ 
-      message: "User registered successfully", 
-      userId: newUser._id // ✅ Return user ID
+    res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
+      }
     });
   } catch (error) {
     res.status(500).json({ message: "Error registering user", error });
   }
 });
+
 
 // ✅ Check if user exists
 router.get("/check-user", async (req, res) => {
@@ -61,8 +67,14 @@ router.post("/signin", async (req, res) => {
 
     res.status(200).json({ 
       message: "Sign in successful!", 
-      userId: user._id // ✅ Return user ID
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
     });
+    
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

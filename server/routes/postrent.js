@@ -37,6 +37,13 @@ router.post("/", upload.array("images", 5), async (req, res) => {
     const capacityValue = Number(capacity);
 
     // ✅ Validation checks
+    if (capacityValue < 0) {
+      return res.status(400).json({ message: "❌ Capacity cannot be negative." });
+    }
+    if (rentValue < 0) {
+      return res.status(400).json({ message: "❌ Rent cannot be negative." });
+    }
+
     if (capacityValue > 10) {
       return res.status(400).json({ message: "❌ Capacity cannot exceed 10." });
     }
