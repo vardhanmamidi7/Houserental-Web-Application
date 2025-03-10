@@ -7,7 +7,7 @@ const router = express.Router();
 // ✅ Create a new booking & order when "Contact Owner" is clicked
 router.post("/", async (req, res) => {
   try {
-    console.log("📌 Received Booking Request:", req.body); // Debugging log
+    console.log("📌 Received Booking Request:", req.body); // Debugging Log
 
     const { userId, propertyId, ownerId } = req.body;
 
@@ -16,7 +16,14 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "❌ Missing required fields" });
     }
 
-    // ✅ Create a booking in MongoDB
+    // ✅ Check if booking already exists
+    const existingBooking = await Booking.findOne({ user: userId, property: propertyId });
+    if (existingBooking) {
+      console.log("⚠️ Booking already exists for this user and property.");
+      return res.status(400).json({ message: "Booking request already sent." });
+    }
+
+    // ✅ Create a new booking if no existing one
     const newBooking = new Booking({
       user: userId,
       property: propertyId,
@@ -25,9 +32,9 @@ router.post("/", async (req, res) => {
     });
 
     await newBooking.save();
-    console.log("✅ Booking Saved:", newBooking);
+    console.log("✅ Booking Created:", newBooking);
 
-    // ✅ Create an order for the owner
+    // ✅ Create an order for the owner (only if booking is new)
     const newOrder = new Order({
       owner: ownerId,
       user: userId,
@@ -35,7 +42,7 @@ router.post("/", async (req, res) => {
     });
 
     await newOrder.save();
-    console.log("✅ Order Saved:", newOrder);
+    console.log("✅ Order Created:", newOrder);
 
     res.status(201).json({
       message: "✅ Booking request sent successfully!",
@@ -47,6 +54,7 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: "❌ Server Error", error: error.message });
   }
 });
+
 
 
 // ✅ Fetch bookings for "Your Bookings" page (for renters)

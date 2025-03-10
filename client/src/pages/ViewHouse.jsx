@@ -36,7 +36,7 @@ const ViewHouse = () => {
   const handleContactOwner = async () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem("user"));
-      console.log("📌 Stored User Data:", storedUser); // Debugging log
+      console.log("📌 Stored User Data:", storedUser);
   
       if (!storedUser || !storedUser._id) {
         alert("User not found. Please log in again.");
@@ -50,22 +50,30 @@ const ViewHouse = () => {
       }
   
       const bookingData = {
-        userId: storedUser._id,  // ✅ Match backend schema
-        propertyId: house._id,   // ✅ Match backend schema
-        ownerId: house.owner._id // ✅ Match backend schema
+        userId: storedUser._id,
+        propertyId: house._id,
+        ownerId: house.owner._id,
       };
   
-      console.log("📌 Sending Booking Data:", bookingData); // Debugging log
+      console.log("📌 Sending Booking Data:", bookingData);
   
       const response = await axios.post("http://localhost:5001/api/bookings", bookingData);
-  
-      console.log("✅ Booking & Order Created:", response.data); // Log response from server
+      
+      console.log("✅ Booking & Order Created:", response.data);
       alert("Booking request sent successfully!");
+  
     } catch (err) {
       console.error("❌ Error creating booking:", err.response?.data || err.message);
-      alert(`Failed to send request: ${err.response?.data?.message || err.message}`);
+  
+      // ✅ If the response message is "Booking request already sent", show an alert and stop further requests
+      if (err.response?.status === 400 && err.response?.data?.message === "Booking request already sent.") {
+        alert("Booking request already sent. You cannot send another request for this house.");
+      } else {
+        alert(`Failed to send request: ${err.response?.data?.message || err.message}`);
+      }
     }
   };
+  
   
   if (error) return <p className="text-red-500 text-center">{error}</p>;
   if (!house) return <p className="text-gray-400 text-center">Loading...</p>;

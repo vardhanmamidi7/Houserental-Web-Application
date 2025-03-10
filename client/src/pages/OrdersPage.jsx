@@ -3,25 +3,27 @@ import axios from "axios";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
-  const [ownerId, setOwnerId] = useState(null); // Store logged-in user ID
+  const [ownerId, setOwnerId] = useState(null);
 
   useEffect(() => {
-    // ✅ Fetch logged-in user ID (Assuming it's stored in localStorage)
-    const user = JSON.parse(localStorage.getItem("user")); // Adjust key if different
+    const user = JSON.parse(localStorage.getItem("user"));
     if (user && user._id) {
       setOwnerId(user._id);
     }
   }, []);
 
   useEffect(() => {
-    if (!ownerId) return; // Don't fetch if no user ID
+    if (!ownerId) return;
 
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/orders/${ownerId}`);
+        console.log(`📌 Fetching orders from: http://localhost:5001/api/orders/owner/${ownerId}`);
+        
+        const response = await axios.get(`http://localhost:5001/api/orders/owner/${ownerId}`);
+        console.log("✅ Orders Fetched:", response.data);
         setOrders(response.data);
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error("❌ Error fetching orders:", error.response?.data || error.message);
       }
     };
 
@@ -36,9 +38,9 @@ const OrdersPage = () => {
         <ul className="mt-4 space-y-4">
           {orders.map((order) => (
             <li key={order._id} className="bg-gray-800 p-4 rounded-lg shadow-md">
-              <p><strong>Property:</strong> {order.property?.title}</p>
-              <p><strong>Renter:</strong> {order.user?.name}</p>
-              <p><strong>Location:</strong> {order.property?.location}</p>
+              <p><strong>Property:</strong> {order.property?.title || "N/A"}</p>
+              <p><strong>Renter:</strong> {order.user?.name || "N/A"}</p>
+              <p><strong>Location:</strong> {order.property?.location || "N/A"}</p>
             </li>
           ))}
         </ul>
