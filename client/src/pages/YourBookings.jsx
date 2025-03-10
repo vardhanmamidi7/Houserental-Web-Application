@@ -14,23 +14,27 @@ const YourBookings = () => {
           setLoading(false);
           return;
         }
-
+  
         const userId = storedUser._id;
-        console.log("📌 Fetching bookings for user:", userId); // Debugging log
-
+        console.log("📌 Fetching bookings for user:", userId);
+  
         const response = await axios.get(`http://localhost:5001/api/bookings/user/${userId}`);
-
-        console.log("📌 Fetched Bookings Data:", response.data); // Debugging log
         setBookings(response.data);
       } catch (err) {
-        console.error("❌ Error fetching orders:", err.response?.data || err.message);
+        console.error("❌ Error fetching bookings:", err.response?.data || err.message);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchBookings();
+    
+    // 🔄 Auto-refresh every 5 seconds to reflect updates
+    const interval = setInterval(fetchBookings, 5000);
+  
+    return () => clearInterval(interval);
   }, []);
+  
 
   if (loading) return <p className="text-center text-gray-400">Loading...</p>;
   if (bookings.length === 0) return <p className="text-center text-gray-400">No bookings found.</p>;

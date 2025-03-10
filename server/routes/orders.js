@@ -67,7 +67,7 @@ router.put("/update-status/:orderId", async (req, res) => {
     }
 
     // ✅ Check if Order Exists
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("user");
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -77,6 +77,10 @@ router.put("/update-status/:orderId", async (req, res) => {
     await order.save();
 
     console.log(`✅ Order ${orderId} updated to ${status}`);
+
+    // ✅ Update the Bookings Page for Renter
+    const userId = order.user._id;
+    console.log(`📌 Updating "Your Bookings" for user: ${userId}`);
 
     res.json({ message: "Order status updated successfully", order });
   } catch (error) {

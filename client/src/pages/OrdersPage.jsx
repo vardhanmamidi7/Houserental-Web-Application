@@ -14,18 +14,17 @@ const OrdersPage = () => {
   }, []);
 
   // ✅ Fetch Orders for the Logged-in Owner
-  useEffect(() => {
+  const fetchOrders = async () => {
     if (!ownerId) return;
+    try {
+      const response = await axios.get(`http://localhost:5001/api/orders/owner/${ownerId}`);
+      setOrders(response.data);
+    } catch (error) {
+      console.error("❌ Error fetching orders:", error.response?.data || error.message);
+    }
+  };
 
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5001/api/orders/owner/${ownerId}`);
-        setOrders(response.data);
-      } catch (error) {
-        console.error("❌ Error fetching orders:", error.response?.data || error.message);
-      }
-    };
-
+  useEffect(() => {
     fetchOrders();
   }, [ownerId]);
 
@@ -36,12 +35,8 @@ const OrdersPage = () => {
 
       await axios.put(`http://localhost:5001/api/orders/update-status/${orderId}`, { status });
 
-      // ✅ Update UI after status change
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === orderId ? { ...order, status } : order
-        )
-      );
+      // ✅ Fetch Updated Orders
+      fetchOrders();
 
       alert(`Booking ${status}`);
     } catch (error) {
