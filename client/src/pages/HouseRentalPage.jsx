@@ -9,23 +9,28 @@ const HouseRentalPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // ✅ Fetch houses only once
   useEffect(() => {
     const fetchHouses = async () => {
       try {
         const response = await axios.get("http://localhost:5001/api/properties");
-        console.log("Fetched Houses:", response.data);
-        setHouses(response.data);
-        setFilteredHouses(response.data); // Initially, show all houses
+        console.log("📌 Fetched Houses:", response.data);
+
+        // ✅ Only update if data has changed
+        if (JSON.stringify(houses) !== JSON.stringify(response.data)) {
+          setHouses(response.data);
+          setFilteredHouses(response.data);
+        }
       } catch (err) {
-        console.error("Error fetching houses:", err);
+        console.error("❌ Error fetching houses:", err);
         setError("Failed to load house listings. Please try again later.");
       }
     };
 
     fetchHouses();
-  }, []);
+  }, []); // ✅ Runs only once
 
-  // Handle search
+  // ✅ Handle search with optimization
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
@@ -33,12 +38,15 @@ const HouseRentalPage = () => {
     const filtered = houses.filter((house) =>
       house.location.toLowerCase().includes(value)
     );
-    setFilteredHouses(filtered);
+
+    if (JSON.stringify(filtered) !== JSON.stringify(filteredHouses)) {
+      setFilteredHouses(filtered);
+    }
   };
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
-      {/* Navbar */}
+      {/* ✅ Navbar */}
       <nav className="flex justify-between items-center p-4 bg-gray-800">
         <div className="text-2xl font-bold text-purple-400">Logo</div>
         <div className="flex gap-6">
@@ -64,7 +72,7 @@ const HouseRentalPage = () => {
         </div>
       </nav>
 
-      {/* Search Bar */}
+      {/* ✅ Search Bar */}
       <div className="p-4 flex justify-center">
         <input
           type="text"
@@ -75,30 +83,34 @@ const HouseRentalPage = () => {
         />
       </div>
 
-      {/* Error Message */}
+      {/* ✅ Error Message */}
       {error && <p className="text-red-500 text-center">{error}</p>}
 
-      {/* House Listings */}
+      {/* ✅ House Listings */}
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredHouses.length > 0 ? (
           filteredHouses.map((house) => (
             <div key={house._id} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
-              {/* House Image */}
+              {/* ✅ House Image with proper fallback */}
               <img
-                src={house?.images?.length ? `http://localhost:5001${house.images[0]}` : "/default-house.jpg"}
+                src={house?.images?.[0] ? `http://localhost:5001${house.images[0]}` : "/default-house.jpg"}
                 alt="House"
                 className="w-full h-40 object-cover"
-                onError={(e) => (e.target.src = "/default-house.jpg")} // Fallback image
+                onError={(e) => {
+                  if (e.target.src !== "/default-house.jpg") {
+                    e.target.src = "/default-house.jpg"; // ✅ Prevents infinite fallback updates
+                  }
+                }}
               />
 
-              {/* House Details */}
+              {/* ✅ House Details */}
               <div className="p-4">
                 <h3 className="text-lg font-bold">{house.title}</h3>
                 <p className="text-sm text-gray-400">{house.location}</p>
                 <p className="text-purple-400 font-semibold">${house.rent}/month</p>
                 <p className="text-gray-300 text-sm mt-2">{house.description}</p>
 
-                {/* View Button */}
+                {/* ✅ View Button */}
                 <button
                   className="mt-4 bg-purple-500 px-4 py-2 w-full rounded-lg hover:bg-purple-600"
                   onClick={() => navigate(`/viewhouse/${house._id}`)}

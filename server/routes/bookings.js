@@ -61,22 +61,18 @@ router.post("/", async (req, res) => {
 router.get("/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log("📌 Fetching bookings for user:", userId); // Debugging Log
-
-    const bookings = await Booking.find({ user: userId }).populate("property");
     
-    if (!bookings || bookings.length === 0) {
-      console.log("❌ No bookings found for user:", userId);
-      return res.status(404).json({ message: "No bookings found" });
-    }
-
-    console.log("✅ Found bookings:", bookings);
-    res.json(bookings);
+    const bookings = await Order.find({ user: userId })
+      .populate("property", "title location rent")
+      .populate("owner", "name email");
+    
+    res.status(200).json(bookings);
   } catch (error) {
     console.error("❌ Error fetching bookings:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
 
 
 // ✅ Fetch orders for "Orders" page (for owners)
