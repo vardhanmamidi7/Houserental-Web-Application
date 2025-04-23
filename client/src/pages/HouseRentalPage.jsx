@@ -9,9 +9,9 @@ const HouseRentalPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const name = localStorage.getItem("name");
-  const role = localStorage.getItem("role"); // "Owner" or "Rent-Taking Person"
-  const userId = localStorage.getItem("userId");
+  const name = sessionStorage.getItem("name");
+  const role = sessionStorage.getItem("role");
+  const userId = sessionStorage.getItem("userId");
 
   // Debug logs
   console.log("User Details:");
@@ -23,10 +23,8 @@ const HouseRentalPage = () => {
     const fetchHouses = async () => {
       try {
         const response = await axios.get("http://localhost:5001/api/properties");
-        if (JSON.stringify(houses) !== JSON.stringify(response.data)) {
-          setHouses(response.data);
-          setFilteredHouses(response.data);
-        }
+        setHouses(response.data);
+        setFilteredHouses(response.data);
       } catch (err) {
         console.error("Error fetching houses:", err);
         setError("Unable to load house listings. Please try again later.");
@@ -34,19 +32,17 @@ const HouseRentalPage = () => {
     };
 
     fetchHouses();
-  }, [houses]);
+  }, []); // Only fetch once
 
   const handleSearch = (e) => {
-    const value = e.target.value.toLowerCase();
+    const value = e.target.value.toLowerCase().trim();
     setSearchTerm(value);
 
     const filtered = houses.filter((house) =>
       house.location.toLowerCase().includes(value)
     );
 
-    if (JSON.stringify(filtered) !== JSON.stringify(filteredHouses)) {
-      setFilteredHouses(filtered);
-    }
+    setFilteredHouses(filtered);
   };
 
   return (
@@ -74,9 +70,6 @@ const HouseRentalPage = () => {
           )}
         </div>
       </nav>
-
-      {/* Debug Info */}
-    
 
       {/* Search Bar */}
       <div className="p-6 flex justify-center">
@@ -120,6 +113,7 @@ const HouseRentalPage = () => {
                 <button
                   className="mt-4 w-full bg-purple-600 hover:bg-purple-700 py-2 rounded-lg text-sm font-semibold transition duration-300"
                   onClick={() => navigate(`/viewhouse/${house._id}`)}
+                  aria-label={`View details of ${house.title}`}
                 >
                   View Details
                 </button>
@@ -135,4 +129,3 @@ const HouseRentalPage = () => {
 };
 
 export default HouseRentalPage;
-
