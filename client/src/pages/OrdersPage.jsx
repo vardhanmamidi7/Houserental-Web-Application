@@ -5,7 +5,6 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [ownerId, setOwnerId] = useState(null);
 
-  // ✅ Fetch logged-in user ID
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user._id) {
@@ -13,14 +12,13 @@ const OrdersPage = () => {
     }
   }, []);
 
-  // ✅ Fetch Orders for the Logged-in Owner
   const fetchOrders = async () => {
     if (!ownerId) return;
     try {
       const response = await axios.get(`http://localhost:5001/api/orders/owner/${ownerId}`);
       setOrders(response.data);
     } catch (error) {
-      console.error("❌ Error fetching orders:", error.response?.data || error.message);
+      console.error("Error fetching orders:", error.response?.data || error.message);
     }
   };
 
@@ -28,49 +26,72 @@ const OrdersPage = () => {
     fetchOrders();
   }, [ownerId]);
 
-  // ✅ Function to Accept/Reject Booking
   const handleStatusChange = async (orderId, status) => {
     try {
-      console.log(`📌 Updating Order ID: ${orderId} ➡️ Status: ${status}`);
-
       await axios.put(`http://localhost:5001/api/orders/update-status/${orderId}`, { status });
-
-      // ✅ Fetch Updated Orders
       fetchOrders();
-
       alert(`Booking ${status}`);
     } catch (error) {
-      console.error(`❌ Error updating status:`, error.response?.data || error.message);
+      console.error("Error updating status:", error.response?.data || error.message);
     }
   };
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen p-6">
-      <h2 className="text-2xl font-bold text-purple-400 mb-4">Orders</h2>
+    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen p-6">
+      <div className="relative mb-10">
+        <h2 className="text-5xl font-extrabold text-center text-purple-400 drop-shadow-md tracking-wide z-10 relative">
+          All Orders
+        </h2>
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 blur-2xl rounded-xl opacity-60 z-0"></div>
+      </div>
 
       {orders.length > 0 ? (
-        <ul className="mt-4 space-y-4">
+        <ul className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {orders.map((order) => (
-            <li key={order._id} className="bg-gray-800 p-6 rounded-lg shadow-md border border-purple-500">
-              <p className="text-lg"><strong>🏠 Property:</strong> {order.property?.title || "N/A"}</p>
-              <p className="text-lg"><strong>👤 Renter:</strong> {order.user?.name || "N/A"}</p>
-              <p className="text-lg"><strong>📍 Location:</strong> {order.property?.location || "N/A"}</p>
-              <p className="text-lg"><strong>📌 Status:</strong> <span className={`font-semibold ${order.status === "Accepted" ? "text-green-400" : order.status === "Rejected" ? "text-red-400" : "text-yellow-400"}`}>{order.status || "Pending"}</span></p>
+            <li
+              key={order._id}
+              className="bg-gray-800 hover:scale-[1.02] transition-transform duration-300 ease-in-out p-6 rounded-2xl shadow-2xl border border-purple-500/30"
+            >
+              <p className="text-lg mb-2">
+                <span className="font-semibold text-purple-300">Property:</span>{" "}
+                {order.property?.title || "N/A"}
+              </p>
+              <p className="text-lg mb-2">
+                <span className="font-semibold text-purple-300">Renter:</span>{" "}
+                {order.user?.name || "N/A"}
+              </p>
+              <p className="text-lg mb-2">
+                <span className="font-semibold text-purple-300">Location:</span>{" "}
+                {order.property?.location || "N/A"}
+              </p>
+              <p className="text-lg mb-4 flex items-center gap-2">
+                <span className="font-semibold text-purple-300">Status:</span>{" "}
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    order.status === "Accepted"
+                      ? "bg-green-500/20 text-green-300 border border-green-400"
+                      : order.status === "Rejected"
+                      ? "bg-red-500/20 text-red-300 border border-red-400"
+                      : "bg-yellow-500/20 text-yellow-300 border border-yellow-400"
+                  }`}
+                >
+                  {order.status || "Pending"}
+                </span>
+              </p>
 
-              {/* ✅ Show Buttons Only If Status Is Pending */}
               {order.status === "Pending" && (
-                <div className="mt-4 flex gap-4">
-                  <button 
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-semibold shadow-lg transition-all"
+                <div className="flex gap-4 mt-4">
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-medium shadow-md transition-all"
                     onClick={() => handleStatusChange(order._id, "Accepted")}
                   >
-                    ✅ Accept
+                    Accept
                   </button>
-                  <button 
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-semibold shadow-lg transition-all"
+                  <button
+                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg font-medium shadow-md transition-all"
                     onClick={() => handleStatusChange(order._id, "Rejected")}
                   >
-                    ❌ Reject
+                    Reject
                   </button>
                 </div>
               )}
@@ -78,7 +99,7 @@ const OrdersPage = () => {
           ))}
         </ul>
       ) : (
-        <p className="text-gray-400 mt-4">No orders yet.</p>
+        <p className="text-center text-gray-400 mt-10 animate-pulse">No orders yet.</p>
       )}
     </div>
   );
