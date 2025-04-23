@@ -4,7 +4,7 @@ import Property from "../models/Property.js";
 
 const router = express.Router();
 
-// ✅ Multer setup for handling image uploads
+// Multer setup for handling image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -16,15 +16,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// ✅ Route to handle property posting
+// Route to handle property posting
 router.post("/", upload.array("images", 5), async (req, res) => {
   try {
     console.log("📌 Received Data:", req.body); // Debugging
     console.log("📌 Received Files:", req.files); // Debugging
 
-    // Ensure body fields are parsed correctly
     const { title, description, type, rent, location, capacity, owner } = req.body;
 
+    // Ensure body fields are parsed correctly
     if (!title || !description || !type || !rent || !location || !capacity || !owner) {
       return res.status(400).json({
         message: "❌ Missing required fields",
@@ -32,16 +32,12 @@ router.post("/", upload.array("images", 5), async (req, res) => {
       });
     }
 
-    // ✅ Convert rent and capacity to numbers
     const rentValue = Number(rent);
     const capacityValue = Number(capacity);
 
-    // ✅ Validation checks
-    if (capacityValue < 0) {
-      return res.status(400).json({ message: "❌ Capacity cannot be negative." });
-    }
-    if (rentValue < 0) {
-      return res.status(400).json({ message: "❌ Rent cannot be negative." });
+    // Validation checks
+    if (capacityValue < 0 || rentValue < 0) {
+      return res.status(400).json({ message: "❌ Capacity and Rent cannot be negative." });
     }
 
     if (capacityValue > 10) {
@@ -51,12 +47,10 @@ router.post("/", upload.array("images", 5), async (req, res) => {
       return res.status(400).json({ message: "❌ Rent cannot exceed 50,000." });
     }
 
-    // ✅ Check if images exist before mapping
     const images = req.files && req.files.length > 0
       ? req.files.map((file) => `/uploads/${file.filename}`)
       : [];
 
-    // ✅ Create new property
     const newProperty = new Property({
       title,
       description,

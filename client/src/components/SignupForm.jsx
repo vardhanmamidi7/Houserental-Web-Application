@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -8,7 +8,7 @@ const Signup = () => {
     email: "",
     state: "",
     password: "",
-    role: "Rent-Taking Person", // Default role
+    role: "Rent-Taking Person",
   });
 
   const [message, setMessage] = useState("");
@@ -23,22 +23,24 @@ const Signup = () => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
-  
+
     try {
       const response = await fetch("http://localhost:5001/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         setMessage("✅ User registered successfully!");
-  
-        // ✅ Store full user details in localStorage
-        localStorage.setItem("user", JSON.stringify(data.user));
-  
+
+        // 🟢 Store individual user details
+        localStorage.setItem("name", data.user.name);
+        localStorage.setItem("role", data.user.role);
+        localStorage.setItem("userId", data.user._id);
+
         setTimeout(() => {
           navigate("/houserental");
         }, 1000);
@@ -51,7 +53,6 @@ const Signup = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
@@ -132,6 +133,15 @@ const Signup = () => {
         >
           {loading ? "Signing up..." : "Sign Up"}
         </button>
+
+        <div className="mt-4 text-center text-gray-400">
+          <p>
+            Already have an account?{" "}
+            <Link to="/signin" className="text-purple-400 hover:underline">
+              Sign In
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );

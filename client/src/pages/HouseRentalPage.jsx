@@ -9,6 +9,16 @@ const HouseRentalPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const name = localStorage.getItem("name");
+  const role = localStorage.getItem("role"); // "Owner" or "Rent-Taking Person"
+  const userId = localStorage.getItem("userId");
+
+  // Debug logs
+  console.log("User Details:");
+  console.log("Name:", name);
+  console.log("Role:", role);
+  console.log("User ID:", userId);
+
   useEffect(() => {
     const fetchHouses = async () => {
       try {
@@ -45,17 +55,28 @@ const HouseRentalPage = () => {
       <nav className="flex justify-between items-center p-5 bg-gray-800 shadow-lg">
         <div className="text-2xl font-extrabold text-purple-400 tracking-wide">HomeStay</div>
         <div className="flex gap-5 items-center text-sm font-medium">
-          <button onClick={() => navigate("/your-bookings")} className="hover:text-purple-400 transition">Your Bookings</button>
-          <button className="hover:text-purple-400 transition">Profile</button>
-          <button onClick={() => navigate("/orders")} className="hover:text-purple-400 transition">Orders</button>
-          <button
-            className="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-md transition text-white"
-            onClick={() => navigate("/postrent")}
-          >
-            Post a House
-          </button>
+          <button className="hover:text-purple-400 transition" onClick={() => navigate("/profile")}>Profile</button>
+
+          {role === "Owner" && (
+            <>
+              <button className="hover:text-purple-400 transition" onClick={() => navigate("/orders")}>Your Orders</button>
+              <button
+                className="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-md transition text-white"
+                onClick={() => navigate("/postrent")}
+              >
+                Post a House
+              </button>
+            </>
+          )}
+
+          {role === "Rent-Taking Person" && (
+            <button className="hover:text-purple-400 transition" onClick={() => navigate("/your-bookings")}>Your Bookings</button>
+          )}
         </div>
       </nav>
+
+      {/* Debug Info */}
+    
 
       {/* Search Bar */}
       <div className="p-6 flex justify-center">
@@ -114,3 +135,4 @@ const HouseRentalPage = () => {
 };
 
 export default HouseRentalPage;
+

@@ -19,11 +19,11 @@ const PostRent = () => {
 
   const navigate = useNavigate();
 
-  // ✅ Fetch user ID from localStorage
+  // Fetch user ID from localStorage
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user")); // ✅ Get full user object
+    const storedUser = JSON.parse(localStorage.getItem("user")); 
     if (storedUser && storedUser._id) {
-      setUserId(storedUser._id); // ✅ Store correct user ID
+      setUserId(storedUser._id); 
     } else {
       setMessage("❌ User not found. Please log in again.");
       setTimeout(() => {
@@ -32,7 +32,7 @@ const PostRent = () => {
     }
   }, []);
 
-  // ✅ Handle image selection & preview
+  // Handle image selection & preview
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setFormData((prev) => ({ ...prev, images: files }));
@@ -42,7 +42,7 @@ const PostRent = () => {
     setImagePreviews(previews);
   };
 
-  // ✅ Handle form submission
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -62,7 +62,7 @@ const PostRent = () => {
       }
     });
 
-    formDataToSend.append("owner", userId); // ✅ Attach the correct user ID
+    formDataToSend.append("owner", userId); // Attach the correct user ID
 
     try {
       const response = await fetch("http://localhost:5001/api/postrent", {
@@ -74,7 +74,7 @@ const PostRent = () => {
       if (response.ok) {
         setMessage("✅ Property posted successfully!");
 
-        // ✅ Redirect to House Rental page after 2 seconds
+        // Redirect to House Rental page after 2 seconds
         setTimeout(() => {
           navigate("/houserental");
         }, 2000);

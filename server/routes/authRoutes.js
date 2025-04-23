@@ -16,7 +16,7 @@ router.post("/signup", async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
+    // Create new user with role
     const newUser = new User({ name, phone, email, password: hashedPassword, state, role });
     await newUser.save();
 
@@ -52,28 +52,40 @@ router.get("/check-user", async (req, res) => {
   }
 });
 
+
+// ✅ Sign-in Route
+
+
+
 // ✅ Sign-in Route
 router.post("/signin", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found." });
 
+    // Check if the role matches
+    if (user.role !== role) {
+      return res.status(400).json({ message: "Incorrect role." });
+    }
+
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials." });
 
-    res.status(200).json({ 
-      message: "Sign in successful!", 
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
-    });
+    // after creating or validating user
+res.status(200).json({
+  message: "Success",
+  user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role, // ✅ Add this line
+  },
+});
+
     
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -81,3 +93,7 @@ router.post("/signin", async (req, res) => {
 });
 
 export default router;
+
+
+
+
